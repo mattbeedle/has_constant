@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{has_constant}
-  s.version = "0.2.1"
+  s.version = "0.2.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["mattbeedle"]
@@ -27,8 +27,8 @@ Gem::Specification.new do |s|
      "VERSION",
      "has_constant.gemspec",
      "lib/has_constant.rb",
-     "lib/orm/active_record.rb",
-     "lib/orm/mongoid.rb",
+     "lib/has_constant/orm/active_record.rb",
+     "lib/has_constant/orm/mongoid.rb",
      "test/has_constant_test.rb",
      "test/helper.rb",
      "test/unit/orm/active_record_test.rb",
