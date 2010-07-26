@@ -5,8 +5,8 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "has_constant"
-    gem.summary = %Q{TODO: one-line summary of your gem}
-    gem.description = %Q{TODO: longer description of your gem}
+    gem.summary = %Q{Allows certain fields to be limited to a set of values}
+    gem.description = %Q{Allows certain fields to be limited to a set of values}
     gem.email = "mattbeedle@gmail.com"
     gem.homepage = "http://github.com/mattbeedle/has_constant"
     gem.authors = ["mattbeedle"]
