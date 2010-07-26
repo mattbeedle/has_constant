@@ -20,6 +20,7 @@ class User < ActiveRecord::Base
 end
 
 In the view
+
 <% form_for @user || User.new do |form| %>
   <%= form.select :salutation, User.salutations -%>
   <%= form.submit 'submit' -%>
@@ -28,7 +29,9 @@ In the view
 u = User.new(:salutation => 'Mrs')
 
 u.salutation #=> 'Mrs'
+
 I18n.locale = :de
+
 u.salutation #=> 'Frau'
 
 === with ActiveRecord
@@ -40,12 +43,17 @@ class User < ActiveRecord::Base
 end
 
 User.salutations #=> ['Mr', 'Mrs']
+
 u = User.new(:salutation => 'Dr')
+
 u.salutation #=> nil
+
 u.salutation = 'Mr'
+
 u.salutation #=> 'Mr'
 
 === with Mongoid
+
 class User
   include Mongoid::Document
   include HasConstant
@@ -57,6 +65,7 @@ end
 User.industries #=> ['IT/Development', 'Marketing']
 
 === without a database
+
 class User
   include HasConstant
 
@@ -66,6 +75,7 @@ end
 User.job_roles #=> ['Junior Developer', 'Developer', 'CTO', 'Other']
 
 === with a lambda or proc
+
 class User
   include HasConstant
 
@@ -74,16 +84,25 @@ class User
 end
 
 (assuming the correct translations exist)
+
 I18n.locale = :en
+
 User.salutations #=> ['Mr', 'Mrs']
+
 I18n.locale = :de
+
 User.salutations #=> ['Herr', 'Frau']
+
 u = User.new(:salutation => 'Herr')
+
 u.salutation #=> 'Herr'
+
 I18n.locale = :en
+
 u.salutation #=> 'Mr'
 
 == with simple_form (http://github.com/plataformatec/simple_form)
+
 <%= form.input :salutation, :collection => User.salutations -%>
 
 == Note on Patches/Pull Requests
