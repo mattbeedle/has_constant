@@ -1,6 +1,88 @@
-= has_constant
+= HasConstant
 
-Description goes here.
+HasConstant is a gem to limit the values that a certain field may contain.
+I find it very useful for multilingual sites to translate the values in forms and in the corresponding models.
+It's also useful for pretty much any field in a model which is filled in from a select field or radio button.
+
+Because HasConstant takes a list, and stores the select index in the model, it can be used to translate
+the values.  Two important points to acheive this though; First of all, the two lists must be the same length,
+so, if you are storing salutations 'Mr' and 'Mrs', then you must have the corresponding 'Herr' and 'Frau'
+translations in your de locale file.  Also, you must always add any new values to the end of the list.
+
+== Examples
+
+class User < ActiveRecord::Base
+  include HasConstant
+  include HasConstant::Orm::ActiveRecord
+
+  has_constant :salutations, lambda { I18n.t(:salutations) }
+end
+
+In the view
+<% form_for @user || User.new do |form| %>
+  <%= form.select :salutation, User.salutations -%>
+  <%= form.submit 'submit' -%>
+<% end %>
+
+u = User.new(:salutation => 'Mrs')
+u.salutation #=> 'Mrs'
+I18n.locale = :de
+u.salutation #=> 'Frau'
+
+=== with ActiveRecord
+class User < ActiveRecord::Base
+  include HasConstant
+  include HasConstant::Orm::ActiveRecord
+
+  has_constant :salutations, ['Mr', 'Mrs']
+end
+
+User.salutations #=> ['Mr', 'Mrs']
+u = User.new(:salutation => 'Dr')
+u.salutation #=> nil
+u.salutation = 'Mr'
+u.salutation #=> 'Mr'
+
+=== with Mongoid
+class User
+  include Mongoid::Document
+  include HasConstant
+  include HasConstant::Orm::Mongoid
+
+  has_constant :industries, ['IT/Development', 'Marketing']
+end
+
+User.industries #=> ['IT/Development', 'Marketing']
+
+=== without a database
+class User
+  include HasConstant
+
+  has_constant :job_roles, ['Junior Developer', 'Developer', 'CTO', 'Other']
+end
+
+User.job_roles #=> ['Junior Developer', 'Developer', 'CTO', 'Other']
+
+=== with a lambda or proc
+class User
+  include HasConstant
+
+  has_constant :salutation, lambda { I18n.t(:salutations) }
+  has_constant :industries, Proc.new { I18n.t(:industries) }
+end
+
+(assuming the correct translations exist)
+I18n.locale = :en
+User.salutations #=> ['Mr', 'Mrs']
+I18n.locale = :de
+User.salutations #=> ['Herr', 'Frau']
+u = User.new(:salutation => 'Herr')
+u.salutation #=> 'Herr'
+I18n.locale = :en
+u.salutation #=> 'Mr'
+
+== with simple_form (http://github.com/plataformatec/simple_form)
+<%= form.input :salutation, :collection => User.salutations -%>
 
 == Note on Patches/Pull Requests
  
