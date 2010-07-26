@@ -3,7 +3,7 @@
 HasConstant is a gem to limit the values that a certain field may contain.
 I find it very useful for multilingual sites to translate the values in forms and in the corresponding models.
 It's also useful for pretty much any field in a model which is filled in from a select field or radio button.
-
+<br/>
 Because HasConstant takes a list, and stores the select index in the model, it can be used to translate
 the values.  Two important points to acheive this though; First of all, the two lists must be the same length,
 so, if you are storing salutations 'Mr' and 'Mrs', then you must have the corresponding 'Herr' and 'Frau'
