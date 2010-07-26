@@ -1,5 +1,5 @@
-require 'lib/orm/mongoid'
-require 'lib/orm/active_record'
+require 'has_constant/orm/mongoid'
+require 'has_constant/orm/active_record'
 require 'active_support/inflector'
 module HasConstant
 
