@@ -47,7 +47,11 @@ module HasConstant
       # Add the setter method. This takes the string representation and converts it to an integer to store in the DB
       define_method("#{singular}=") do |val|
         if val.instance_of?(String)
-          instance_variable_set("@#{singular}", values.index(val))
+          if values.index(val)
+            instance_variable_set("@#{singular}", values.index(val))
+          else
+            raise ArgumentError, "value for #{singular} must be in #{self.class.send(name.to_s).join(', ')}"
+          end
         else
           instance_variable_set("@#{singular}", val)
         end

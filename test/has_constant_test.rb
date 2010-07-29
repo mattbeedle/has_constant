@@ -13,6 +13,14 @@ class TestHasConstant < Test::Unit::TestCase
     assert Model.new.respond_to?(:title=)
   end
 
+  should 'raise an exception when a value is provided which is not in the list' do
+    Model.has_constant :titles, ['Mr', 'Mrs']
+    m = Model.new
+    assert_raise ArgumentError do
+      m.title = 'Ms'
+    end
+  end
+
   should 'be able to override accessor' do
     Model.has_constant :titles, ['Mr', 'Mrs'], :accessor => :salutation
     m = Model.new
