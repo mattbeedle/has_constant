@@ -3,6 +3,18 @@ module HasConstant
     module Mongoid
       def self.included( base )
         base.extend(ClassMethods)
+        base.send(:include, InstanceMethods)
+        base.class_eval do
+          validate :validate_has_constant_attributes
+        end
+      end
+
+      module InstanceMethods
+        def validate_has_constant_attributes
+          @has_constant_errors.each do |key, value|
+            self.errors.add key, value
+          end if @has_constant_errors
+        end
       end
 
       module ClassMethods
@@ -18,7 +30,12 @@ module HasConstant
 
           define_method("#{singular}=") do |val|
             if val.instance_of?(String)
-              write_attribute singular.to_sym, self.class.send(name.to_s).index(val)
+              if index = self.class.send(name.to_s).index(val)
+                write_attribute singular.to_sym, index
+              else
+                @has_constant_errors ||= {}
+                @has_constant_errors.merge!(singular.to_sym => "must be one of #{values.join(', ')}")
+              end
             else
               write_attribute singular.to_sym, val
             end

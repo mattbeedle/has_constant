@@ -13,14 +13,22 @@ class MongoUser
 end if defined?(Mongoid)
 
 class MongoidTest < Test::Unit::TestCase
-  should 'save values as integers' do
-    m = MongoUser.new(:salutation => 'Mr')
-    m.save!
-    assert_equal 'Mr', m.salutation
-    assert_equal 0, m.attributes['salutation']
+  context 'Instance' do
+    should 'save values as integers' do
+      m = MongoUser.new(:salutation => 'Mr')
+      m.save!
+      assert_equal 'Mr', m.salutation
+      assert_equal 0, m.attributes['salutation']
+    end
+
+    should 'not be valid when an incorrect value is supplied' do
+      m = MongoUser.new(:salutation => 'asefe')
+      assert !m.valid?
+      assert_equal 'must be one of Mr, Mrs', m.errors[:salutation]
+    end
   end
 
-  context 'scopes' do
+  context 'Named Scopes' do
     setup do
       @man = MongoUser.create!(:salutation => 'Mr')
       @woman = MongoUser.create!(:salutation => 'Mrs')
