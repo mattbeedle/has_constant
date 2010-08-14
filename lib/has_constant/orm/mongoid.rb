@@ -21,8 +21,6 @@ module HasConstant
         def has_constant( name, values, options = {} )
           super(name, values, options)
 
-          values = values.call if values.respond_to?(:call)
-
           singular = (options[:accessor] || name.to_s.singularize).to_s
 
           # Add the getter method. This returns the string representation of the stored value
@@ -35,6 +33,7 @@ module HasConstant
               if index = self.class.send(name.to_s).index(val)
                 write_attribute singular.to_sym, index
               else
+                values = values.call if values.respond_to?(:call)
                 @has_constant_errors ||= {}
                 @has_constant_errors.merge!(singular.to_sym => "must be one of #{values.join(', ')}")
               end
