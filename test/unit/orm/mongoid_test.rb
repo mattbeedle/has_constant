@@ -12,6 +12,16 @@ class MongoUser
   has_constant :salutations, ['Mr', 'Mrs']
 end if defined?(Mongoid)
 
+class MongoUserWithProc
+  include Mongoid::Document
+  include HasConstant
+  include HasConstant::Orm::Mongoid
+
+  field :salutation, :type => Integer
+
+  has_constant :salutations, lambda { ['Mr', 'Mrs'] }
+end if defined?(Mongoid)
+
 class MongoidTest < Test::Unit::TestCase
   context 'Instance' do
     should 'save values as integers' do
@@ -24,7 +34,13 @@ class MongoidTest < Test::Unit::TestCase
     should 'not be valid when an incorrect value is supplied' do
       m = MongoUser.new(:salutation => 'asefe')
       assert !m.valid?
-      assert_equal 'must be one of Mr, Mrs', m.errors[:salutation]
+      assert_equal ['must be one of Mr, Mrs'], m.errors[:salutation]
+    end
+
+    should 'not be valid with an incorrect value is supplied and a proc/lambda has been used' do
+      m = MongoUserWithProc.new(:salutation => 'asefe')
+      assert !m.valid?
+      assert_equal ['must be one of Mr, Mrs'], m.errors[:salutation]
     end
   end
 

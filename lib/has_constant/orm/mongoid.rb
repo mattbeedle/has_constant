@@ -21,6 +21,8 @@ module HasConstant
         def has_constant( name, values, options = {} )
           super(name, values, options)
 
+          values = values.call if values.respond_to?(:call)
+
           singular = (options[:accessor] || name.to_s.singularize).to_s
 
           # Add the getter method. This returns the string representation of the stored value
