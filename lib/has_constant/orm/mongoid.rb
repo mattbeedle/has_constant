@@ -32,7 +32,7 @@ module HasConstant
             if val.instance_of?(String)
               if index = self.class.send(name.to_s).index(val)
                 write_attribute singular.to_sym, index
-              else
+              elsif !val.blank?
                 values = values.call if values.respond_to?(:call)
                 @has_constant_errors ||= {}
                 @has_constant_errors.merge!(singular.to_sym => "must be one of #{values.join(', ')}")

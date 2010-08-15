@@ -42,6 +42,11 @@ class MongoidTest < Test::Unit::TestCase
       assert !m.valid?
       assert_equal ['must be one of Mr, Mrs'], m.errors[:salutation]
     end
+
+    should 'be valid when a blank value is supplied' do
+      m = MongoUserWithProc.new(:salutation => '')
+      assert m.valid?
+    end
   end
 
   context 'Named Scopes' do
