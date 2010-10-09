@@ -41,14 +41,22 @@ module HasConstant
               write_attribute singular.to_sym, val
             end
           end
+          
+          (class << self; self; end).instance_eval do
+            define_method "#{singular}_is".to_sym do |values|
+              values = values.lines.to_a if values.respond_to?(:lines)
+              where(singular.to_sym => { '$in' => values.map { |v| self.send(name.to_sym).index(v) } })
+            end
+            
+            define_method "#{singular}_is_not".to_sym do |values|
+              values = values.lines.to_a if values.respond_to?(:lines)
+              where(singular.to_sym => { '$nin' => values.map { |v| self.send(name.to_sym).index(v) } })
+            end
+          end
 
           class_eval do
             named_scope :by_constant, lambda { |constant,value| { :where =>
               { constant.to_sym => eval("#{self.to_s}.#{constant.pluralize}.index(value)") } } }
-            named_scope "#{singular}_is".to_sym, lambda { |values| { :where =>
-              { singular.to_sym => { '$in' =>  values.to_a.map { |v| self.send(name.to_sym).index(v) } } } } }
-            named_scope "#{singular}_is_not".to_sym, lambda { |values| { :where =>
-              { singular.to_sym => { '$nin' => values.to_a.map { |v| self.send(name.to_sym).index(v) } } } } }
           end
         end
       end
