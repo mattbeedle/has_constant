@@ -46,9 +46,9 @@ module HasConstant
             named_scope :by_constant, lambda { |constant,value| { :where =>
               { constant.to_sym => eval("#{self.to_s}.#{constant.pluralize}.index(value)") } } }
             named_scope "#{singular}_is".to_sym, lambda { |values| { :where =>
-              { singular.to_sym => { '$in' =>  values.map { |v| self.send(name.to_sym).index(v) } } } } }
+              { singular.to_sym => { '$in' =>  values.to_a.map { |v| self.send(name.to_sym).index(v) } } } } }
             named_scope "#{singular}_is_not".to_sym, lambda { |values| { :where =>
-              { singular.to_sym => { '$nin' => values.map { |v| self.send(name.to_sym).index(v) } } } } }
+              { singular.to_sym => { '$nin' => values.to_a.map { |v| self.send(name.to_sym).index(v) } } } } }
           end
         end
       end
