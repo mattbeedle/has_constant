@@ -1,20 +1,18 @@
 module HasConstant
   module Orm
     module Mongoid
-      def self.included( base )
-        base.extend(ClassMethods)
-        base.send(:include, InstanceMethods)
-        base.class_eval do
+      extend ActiveSupport::Concern
+
+      included do
+        class_eval do
           validate :validate_has_constant_attributes
         end
       end
 
-      module InstanceMethods
-        def validate_has_constant_attributes
-          @has_constant_errors.each do |key, value|
-            self.errors.add key, value
-          end if @has_constant_errors
-        end
+      def validate_has_constant_attributes
+        @has_constant_errors.each do |key, value|
+          self.errors.add key, value
+        end if @has_constant_errors
       end
 
       module ClassMethods
@@ -41,13 +39,13 @@ module HasConstant
               write_attribute singular.to_sym, val
             end
           end
-          
+
           (class << self; self; end).instance_eval do
             define_method "#{singular}_is".to_sym do |values|
               values = values.lines.to_a if values.respond_to?(:lines)
               where(singular.to_sym => { '$in' => values.map { |v| self.send(name.to_sym).index(v) } })
             end
-            
+
             define_method "#{singular}_is_not".to_sym do |values|
               values = values.lines.to_a if values.respond_to?(:lines)
               where(singular.to_sym => { '$nin' => values.map { |v| self.send(name.to_sym).index(v) } })
@@ -62,4 +60,4 @@ module HasConstant
       end
     end
   end
-end
+end if defined?(Mongoid)

@@ -1,11 +1,9 @@
-require 'has_constant/orm/mongoid'
-require 'has_constant/orm/active_record'
+require 'active_support'
+require 'has_constant/orm/mongoid' if defined?(Mongoid)
+require 'has_constant/orm/active_record' if defined?(ActiveRecord::Base)
 require 'active_support/inflector'
 module HasConstant
-
-  def self.included(base)
-    base.extend(ClassMethods)
-  end
+  extend ActiveSupport::Concern
 
   # HasConstant takes a Proc containing an array of possible values for a field name
   # The field name is inferred as the singular of the has constant name. For example
@@ -58,7 +56,19 @@ module HasConstant
       end
 
       define_method("#{singular}_is?") do |value|
-        eval("#{singular} == '#{value.to_s}'")
+        send(singular) == value.to_s
+      end
+
+      define_method("#{singular}_is_not?") do |value|
+        !send("#{singular}_is?", value)
+      end
+
+      define_method("#{singular}_in?") do |value_list|
+        value_list.include? send(singular)
+      end
+
+      define_method("#{singular}_not_in?") do |value_list|
+        !send("#{singular}_in?", value_list)
       end
     end
   end

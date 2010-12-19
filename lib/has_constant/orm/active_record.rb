@@ -1,9 +1,7 @@
 module HasConstant
   module Orm
     module ActiveRecord
-      def self.included( base )
-        base.extend(ClassMethods)
-      end
+      extend ActiveSupport::Concern
 
       module ClassMethods
         def has_constant( name, values, options = {} )
@@ -43,4 +41,4 @@ module HasConstant
       end
     end
   end
-end
+end if defined?(ActiveRecord::Base)
