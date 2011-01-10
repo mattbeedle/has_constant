@@ -7,7 +7,7 @@ class User < ActiveRecord::Base
   include HasConstant::Orm::ActiveRecord
 
   has_constant :salutations, ['Mr', 'Mrs']
-end if defined?(ActiveRecord)
+end
 
 class ActiveRecordTest < Test::Unit::TestCase
   should 'save values as integers' do

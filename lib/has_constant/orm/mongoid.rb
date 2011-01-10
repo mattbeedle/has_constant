@@ -60,4 +60,4 @@ module HasConstant
       end
     end
   end
-end if defined?(Mongoid)
+end

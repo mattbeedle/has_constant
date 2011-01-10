@@ -1,7 +1,8 @@
 require 'active_support'
-require 'has_constant/orm/mongoid' if defined?(Mongoid)
-require 'has_constant/orm/active_record' if defined?(ActiveRecord::Base)
+require 'has_constant/orm/mongoid'
+require 'has_constant/orm/active_record'
 require 'active_support/inflector'
+
 module HasConstant
   extend ActiveSupport::Concern
 

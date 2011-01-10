@@ -41,4 +41,4 @@ module HasConstant
       end
     end
   end
-end if defined?(ActiveRecord::Base)
+end
