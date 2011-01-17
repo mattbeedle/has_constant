@@ -32,11 +32,6 @@ class TestHasConstant < Test::Unit::TestCase
     assert_equal ['Mr', 'Mrs'], Model.titles
   end
 
-  should 'only use uniq values' do
-    Model.has_constant :titles, ['Mr', 'Mrs', 'Mr', 'Mr']
-    assert_equal ['Mr', 'Mrs'], Model.titles
-  end
-
   should 'be able to use a proc' do
     Model.has_constant :titles, Proc.new { ['Mr', 'Mrs'] }
     assert_equal ['Mr', 'Mrs'], Model.titles
