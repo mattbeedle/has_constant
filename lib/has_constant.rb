@@ -35,8 +35,8 @@ module HasConstant
       singular = (options[:accessor] || name.to_s.singularize).to_s
 
       (class << self; self; end).instance_eval do
-        values = values.call if values.respond_to?(:call)
-        define_method(name.to_s, lambda { values.uniq })
+        define_method(name.to_s, values) if values.respond_to?(:call)
+        define_method(name.to_s, lambda { values }) unless values.respond_to?(:call)
       end
 
       define_method(singular) do
