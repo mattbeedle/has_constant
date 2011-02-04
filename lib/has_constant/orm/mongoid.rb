@@ -16,7 +16,7 @@ module HasConstant
       end
 
       module ClassMethods
-        def has_constant( name, values, options = {} )
+        def has_constant( name, values = lambda { I18n.t(name) }, options = {} )
           super(name, values, options)
 
           singular = (options[:accessor] || name.to_s.singularize).to_s

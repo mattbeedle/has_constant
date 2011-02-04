@@ -36,6 +36,12 @@ class MongoidTest < Test::Unit::TestCase
       assert MongoUserWithout.fields.map(&:first).include?('sal')
     end
 
+    should 'default values to translated values list' do
+      I18n.stubs(:t).returns(['a', 'b'])
+      MongoUserWithout.has_constant :titles
+      assert_equal ['a', 'b'], MongoUserWithout.titles
+    end
+
     should 'add index when index option is supplied' do
       MongoUserWithout.has_constant :salutations, ['Mr', 'Mrs'], :index => true
       MongoUserWithout.create_indexes
