@@ -21,9 +21,13 @@ module HasConstant
 
           singular = (options[:accessor] || name.to_s.singularize).to_s
 
-          # Add the getter method. This returns the string representation of the stored value
-          define_method(singular) do
-            eval("#{self.class}.#{name.to_s}[self.attributes[singular].to_i] if self.attributes[singular]")
+          class_eval do
+            field singular.to_sym, { :type => Integer }.merge(options)
+
+            index singular.to_sym if options[:index]
+
+            named_scope :by_constant, lambda { |constant,value| { :where =>
+              { constant.to_sym => eval("#{self.to_s}.#{constant.pluralize}.index(value)") } } }
           end
 
           define_method("#{singular}=") do |val|
@@ -40,6 +44,11 @@ module HasConstant
             end
           end
 
+          # Add the getter method. This returns the string representation of the stored value
+          define_method(singular) do
+            eval("#{self.class}.#{name.to_s}[self.attributes[singular].to_i] if self.attributes[singular]")
+          end
+
           (class << self; self; end).instance_eval do
             define_method "#{singular}_is".to_sym do |values|
               values = values.lines.to_a if values.respond_to?(:lines)
@@ -50,11 +59,6 @@ module HasConstant
               values = values.lines.to_a if values.respond_to?(:lines)
               where(singular.to_sym => { '$nin' => values.map { |v| self.send(name.to_sym).index(v) } })
             end
-          end
-
-          class_eval do
-            named_scope :by_constant, lambda { |constant,value| { :where =>
-              { constant.to_sym => eval("#{self.to_s}.#{constant.pluralize}.index(value)") } } }
           end
         end
       end

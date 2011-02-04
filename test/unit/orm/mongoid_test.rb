@@ -7,8 +7,6 @@ class MongoUser
   include HasConstant
   include HasConstant::Orm::Mongoid
 
-  field :salutation, :type => Integer
-
   has_constant :salutations, ['Mr', 'Mrs']
 end if defined?(Mongoid)
 
@@ -17,13 +15,27 @@ class MongoUserWithProc
   include HasConstant
   include HasConstant::Orm::Mongoid
 
-  field :salutation, :type => Integer
-
   has_constant :salutations, lambda { ['Mr', 'Mrs'] }
 end if defined?(Mongoid)
 
+class MongoUserWithout
+  include Mongoid::Document
+  include HasConstant
+  include HasConstant::Orm::Mongoid
+end
+
 class MongoidTest < Test::Unit::TestCase
   context 'Instance' do
+    should 'add the field automatically' do
+      MongoUserWithout.has_constant :salutations, ['Mr', 'Mrs']
+      assert MongoUserWithout.fields.map(&:first).include?('salutation')
+    end
+
+    should 'take the accessor into account when adding the field' do
+      MongoUserWithout.has_constant :salutations, ['Mr', 'Mrs'], :accessor => :sal
+      assert MongoUserWithout.fields.map(&:first).include?('sal')
+    end
+
     should 'save values as integers' do
       m = MongoUser.new(:salutation => 'Mr')
       m.save!
