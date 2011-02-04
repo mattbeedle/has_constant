@@ -30,8 +30,7 @@ module HasConstant
   # User.by_constant('title', 'Mr') #=> [@user]
   #
   module ClassMethods
-    def has_constant(name, values, options = {})
-
+    def has_constant(name, values = lambda { I18n.t(name) }, options = {})
       singular = (options[:accessor] || name.to_s.singularize).to_s
 
       (class << self; self; end).instance_eval do

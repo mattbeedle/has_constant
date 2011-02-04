@@ -9,6 +9,7 @@ group :test do
   gem 'mongoid', '2.0.0.beta.20'
   gem 'bson'
   gem 'bson_ext'
+  gem 'mocha'
 end
 
 group :development do

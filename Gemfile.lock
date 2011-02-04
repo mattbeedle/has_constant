@@ -21,6 +21,8 @@ GEM
       bundler (~> 1.0.0)
       git (>= 1.2.5)
       rake
+    mocha (0.9.11)
+      rake
     mongo (1.1.5)
       bson (>= 1.1.5)
     mongoid (2.0.0.beta.20)
@@ -43,6 +45,7 @@ DEPENDENCIES
   bson
   bson_ext
   jeweler
+  mocha
   mongoid (= 2.0.0.beta.20)
   shoulda
   sqlite3-ruby

@@ -1,10 +1,18 @@
 require 'helper'
+require 'mocha'
 
 class Model
   include HasConstant
 end
 
 class TestHasConstant < Test::Unit::TestCase
+
+  should 'default values to translated values list' do
+    I18n.stubs(:t).returns(['a', 'b'])
+    Model.has_constant :titles
+    assert_equal ['a', 'b'], Model.titles
+  end
+
   should 'default accessor to singular of the constant name' do
     Model.has_constant :titles, ['Mr', 'Mrs']
     assert Model.new.respond_to?(:title)
