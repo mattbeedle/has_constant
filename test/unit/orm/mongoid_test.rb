@@ -36,6 +36,17 @@ class MongoidTest < Test::Unit::TestCase
       assert MongoUserWithout.fields.map(&:first).include?('sal')
     end
 
+    should 'add index when index option is supplied' do
+      MongoUserWithout.has_constant :salutations, ['Mr', 'Mrs'], :index => true
+      MongoUserWithout.create_indexes
+      assert MongoUserWithout.index_information.keys.any? { |key| key.match(/salutation/) }
+    end
+
+    should 'not index when index option is not supplied' do
+      MongoUser.create_indexes
+      assert !MongoUser.index_information.keys.any? { |key| key.match(/salutation/) }
+    end
+
     should 'save values as integers' do
       m = MongoUser.new(:salutation => 'Mr')
       m.save!

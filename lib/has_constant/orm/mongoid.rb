@@ -24,7 +24,7 @@ module HasConstant
           class_eval do
             field singular.to_sym, { :type => Integer }.merge(options)
 
-            index singular.to_sym if options[:index]
+            index singular.to_sym, :background => true if options[:index]
 
             named_scope :by_constant, lambda { |constant,value| { :where =>
               { constant.to_sym => eval("#{self.to_s}.#{constant.pluralize}.index(value)") } } }
