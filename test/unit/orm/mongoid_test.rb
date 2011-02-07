@@ -31,6 +31,12 @@ class MongoidTest < Test::Unit::TestCase
       assert MongoUserWithout.fields.map(&:first).include?('salutation')
     end
 
+    should 'not add the field if it is already there' do
+      MongoUserWithout.send(:field, :salutation, :type => Integer, :default => 0)
+      MongoUserWithout.has_constant :salutations, ['Mr', 'Mrs']
+      assert_equal 'Mr', MongoUserWithout.new.salutation
+    end
+
     should 'take the accessor into account when adding the field' do
       MongoUserWithout.has_constant :salutations, ['Mr', 'Mrs'], :accessor => :sal
       assert MongoUserWithout.fields.map(&:first).include?('sal')

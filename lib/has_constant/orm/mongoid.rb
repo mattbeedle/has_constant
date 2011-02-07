@@ -22,7 +22,9 @@ module HasConstant
           singular = (options[:accessor] || name.to_s.singularize).to_s
 
           class_eval do
-            field singular.to_sym, { :type => Integer }.merge(options)
+            unless fields.map(&:first).include?(singular.to_s)
+              field singular.to_sym, { :type => Integer }.merge(options)
+            end
 
             index singular.to_sym, :background => true if options[:index]
 
