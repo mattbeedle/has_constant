@@ -47,6 +47,11 @@ class MongoidTest < Test::Unit::TestCase
       assert_equal 'Mr', MongoUser.new.salutation
     end
 
+    should 'be able to take default option' do
+      MongoUser2.has_constant :salutations, lambda { %w(Mr Mrs) }, { :default => 0 }
+      assert_equal 'Mr', MongoUser2.new.salutation
+    end
+
     should 'take the accessor into account when adding the field' do
       MongoUser.has_constant :salutations, ['Mr', 'Mrs'], :accessor => :sal
       assert MongoUser.fields.map(&:first).include?('sal')

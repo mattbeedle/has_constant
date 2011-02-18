@@ -23,7 +23,7 @@ module HasConstant
 
           class_eval do
             unless fields.map(&:first).include?(singular.to_s)
-              field singular.to_sym, { :type => values.is_a?(Array) ? Integer : String }.merge(options)
+              field singular.to_sym, { :type => values.is_a?(Hash) ? String : Integer }.merge(options)
             end
 
             index singular.to_sym, :background => true if options[:index]

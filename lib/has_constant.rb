@@ -59,7 +59,8 @@ module HasConstant
           elsif values.is_a?(Hash) && values.has_value?(val)
             instance_variable_set("@#{singular}", values.invert[val].to_s)
           else
-            raise ArgumentError, "value for #{singular} must be in #{self.class.send(name.to_s).join(', ')}"
+            raise ArgumentError,
+              "value for #{singular} must be in #{self.class.send(name.to_s).join(', ')}"
           end
         else
           instance_variable_set("@#{singular}", val)
