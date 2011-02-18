@@ -14,7 +14,6 @@ translations in your de locale file.  Also, you must always add any new values t
 
 class User < ActiveRecord::Base
   include HasConstant
-  include HasConstant::Orm::ActiveRecord
 
   has_constant :salutations, lambda { I18n.t(:salutations) }
 end
@@ -37,7 +36,6 @@ u.salutation #=> 'Frau'
 === with ActiveRecord
 class User < ActiveRecord::Base
   include HasConstant
-  include HasConstant::Orm::ActiveRecord
 
   has_constant :salutations, ['Mr', 'Mrs']
 end
@@ -57,12 +55,25 @@ u.salutation #=> 'Mr'
 class User
   include Mongoid::Document
   include HasConstant
-  include HasConstant::Orm::Mongoid
 
   has_constant :industries, ['IT/Development', 'Marketing']
 end
 
 User.industries #=> ['IT/Development', 'Marketing']
+
+to index the values for querying just add :index => true
+
+=== defaults to use translation file
+
+assuming I18n.t(:salutations) == ['Mr', 'Mrs']
+
+class User
+  include Mongoid::Document
+
+  has_constant :salutations
+end
+
+User.salutations #=> ['Mr', 'Mrs']
 
 === without a database
 
