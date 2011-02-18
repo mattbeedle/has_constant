@@ -1,6 +1,6 @@
 require 'active_support'
 require 'has_constant/orm/mongoid'
-require 'has_constant/orm/active_record'
+require 'has_constant/orm/active_model'
 require 'active_support/inflector'
 
 module HasConstant
@@ -9,8 +9,8 @@ module HasConstant
   included do
     if defined?(Mongoid) && ancestors.include?(Mongoid::Document)
       send(:include, HasConstant::Orm::Mongoid)
-    elsif defined?(ActiveRecord) && ancestors.include?(ActiveRecord::Base)
-      send(:include, HasConstant::Orm::ActiveRecord)
+    elsif defined?(ActiveModel) && !ancestors.map(&:to_s).grep(/^ActiveModel/).blank?
+      send(:include, HasConstant::Orm::ActiveModel)
     end
   end
 
