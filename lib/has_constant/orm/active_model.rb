@@ -16,7 +16,7 @@ module HasConstant
               if values.is_a?(Array)
                 self.class.send(name)[read_attribute(singular).to_i]
               elsif values.is_a?(Hash)
-                self.class.send(name)[read_attribute(singular)]
+                HashWithIndifferentAccess.new(self.class.send(name))[read_attribute(singular)]
               end
             end
           end
