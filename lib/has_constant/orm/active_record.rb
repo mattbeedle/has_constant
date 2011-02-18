@@ -9,9 +9,12 @@ module HasConstant
 
           singular = (options[:accessor] || name.to_s.singularize).to_s
 
-          # Add the getter method. This returns the string representation of the stored value
+          # Add the getter method. This returns the string representation of
+          # the stored value
           define_method(singular) do
-            self.class.send(name)[read_attribute(singular).to_i] if read_attribute(singular)
+            if read_attribute(singular)
+              self.class.send(name)[read_attribute(singular).to_i]
+            end
           end
 
           define_method("#{singular}=") do |val|
@@ -23,14 +26,32 @@ module HasConstant
           end
 
           class_eval do
-            named_scope :by_constant, lambda { |constant,value| { :conditions =>
-              { constant.to_sym => eval("#{self.to_s}.#{constant.pluralize}.index(value)") } } }
-            named_scope "#{singular}_is".to_sym, lambda { |*values| { :conditions =>
-              { singular.to_sym => indexes_for(name, values) }
-            } }
-            named_scope "#{singular}_is_not".to_sym, lambda { |*values| { :conditions =>
-              ["#{singular} NOT IN (?)", indexes_for(name, values)]
-            } }
+            if respond_to?(:scope)
+              scope :by_constant, lambda { |constant,value| { :conditions =>
+                { constant.to_sym =>
+                  eval("#{self.to_s}.#{constant.pluralize}.index(value)") } } }
+
+              scope "#{singular}_is".to_sym, lambda { |*values| { :conditions =>
+                { singular.to_sym => indexes_for(name, values) }
+              } }
+
+              scope "#{singular}_is_not".to_sym, lambda { |*values| {
+                :conditions => ["#{singular} NOT IN (?)",
+                                indexes_for(name, values)] } }
+            else
+              named_scope :by_constant, lambda { |constant,value| {
+                :conditions =>
+                { constant.to_sym =>
+                  eval("#{self.to_s}.#{constant.pluralize}.index(value)") } } }
+
+              named_scope "#{singular}_is".to_sym, lambda { |*values| {
+                :conditions => { singular.to_sym => indexes_for(name, values) }
+              } }
+
+              named_scope "#{singular}_is_not".to_sym, lambda { |*values| {
+                :conditions => ["#{singular} NOT IN (?)",
+                                indexes_for(name, values)] } }
+            end
           end
         end
 
