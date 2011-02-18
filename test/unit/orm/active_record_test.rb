@@ -4,7 +4,6 @@ setup_active_record
 
 class User < ActiveRecord::Base
   include HasConstant
-  include HasConstant::Orm::ActiveRecord
 
   has_constant :salutations, ['Mr', 'Mrs']
 end

@@ -6,6 +6,14 @@ require 'active_support/inflector'
 module HasConstant
   extend ActiveSupport::Concern
 
+  included do
+    if defined?(Mongoid) && ancestors.include?(Mongoid::Document)
+      send(:include, HasConstant::Orm::Mongoid)
+    elsif defined?(ActiveRecord) && ancestors.include?(ActiveRecord::Base)
+      send(:include, HasConstant::Orm::ActiveRecord)
+    end
+  end
+
   # HasConstant takes a Proc containing an array of possible values for a field name
   # The field name is inferred as the singular of the has constant name. For example
   # has_constant :titles

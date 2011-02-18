@@ -1,11 +1,11 @@
 require 'helper'
+require 'mocha'
 
 setup_mongoid
 
 class MongoUser
   include Mongoid::Document
   include HasConstant
-  include HasConstant::Orm::Mongoid
 
   has_constant :salutations, ['Mr', 'Mrs']
 end if defined?(Mongoid)
@@ -13,7 +13,6 @@ end if defined?(Mongoid)
 class MongoUserWithProc
   include Mongoid::Document
   include HasConstant
-  include HasConstant::Orm::Mongoid
 
   has_constant :salutations, lambda { ['Mr', 'Mrs'] }
 end if defined?(Mongoid)
@@ -21,7 +20,6 @@ end if defined?(Mongoid)
 class MongoUserWithout
   include Mongoid::Document
   include HasConstant
-  include HasConstant::Orm::Mongoid
 end
 
 class MongoidTest < Test::Unit::TestCase
