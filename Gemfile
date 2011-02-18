@@ -10,6 +10,10 @@ group :test do
   gem 'bson'
   gem 'bson_ext'
   gem 'mocha'
+
+  gem 'dm-core'
+  gem 'dm-postgres-adapter'
+  gem 'dm-migrations'
 end
 
 group :development do
