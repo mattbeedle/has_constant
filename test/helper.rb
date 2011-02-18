@@ -35,6 +35,9 @@ def connect_active_record
     create_table :users, :force => true do |t|
       t.integer :salutation
     end
+    create_table :things, :force => true do |t|
+      t.string :salutation
+    end
   end
 end
 

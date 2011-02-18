@@ -13,13 +13,19 @@ module HasConstant
           # the stored value
           define_method(singular) do
             if read_attribute(singular)
-              self.class.send(name)[read_attribute(singular).to_i]
+              if values.is_a?(Array)
+                self.class.send(name)[read_attribute(singular).to_i]
+              elsif values.is_a?(Hash)
+                self.class.send(name)[read_attribute(singular)]
+              end
             end
           end
 
           define_method("#{singular}=") do |val|
-            if val.instance_of?(String)
+            if values.is_a?(Array) && val.instance_of?(String)
               write_attribute singular.to_sym, self.class.send(name.to_s).index(val)
+            elsif values.is_a?(Hash) && values.has_value?(val)
+              write_attribute singular.to_sym, values.invert[val].to_s
             else
               write_attribute singular.to_sym, val
             end

@@ -6,58 +6,71 @@ setup_mongoid
 class MongoUser
   include Mongoid::Document
   include HasConstant
-
-  has_constant :salutations, ['Mr', 'Mrs']
 end if defined?(Mongoid)
 
-class MongoUserWithProc
+class MongoUser2
   include Mongoid::Document
   include HasConstant
-
-  has_constant :salutations, lambda { ['Mr', 'Mrs'] }
 end if defined?(Mongoid)
 
-class MongoUserWithout
+class MongoUserWithHash
   include Mongoid::Document
   include HasConstant
-end
+end if defined?(Mongoid)
 
 class MongoidTest < Test::Unit::TestCase
   context 'Instance' do
+
+    context 'using a hash' do
+      setup do
+        MongoUserWithHash.has_constant :salutations, { :first => 'Mr', :second => 'Mrs' }
+        @m = MongoUserWithHash.new(:salutation => 'Mr')
+      end
+
+      should 'store the hash key' do
+        assert_equal 'first', @m.attributes['salutation']
+      end
+
+      should 'return the correct value' do
+        assert_equal 'Mr', @m.salutation
+      end
+    end
+
     should 'add the field automatically' do
-      MongoUserWithout.has_constant :salutations, ['Mr', 'Mrs']
-      assert MongoUserWithout.fields.map(&:first).include?('salutation')
+      MongoUser.has_constant :salutations, ['Mr', 'Mrs']
+      assert MongoUser.fields.map(&:first).include?('salutation')
     end
 
     should 'not add the field if it is already there' do
-      MongoUserWithout.send(:field, :salutation, :type => Integer, :default => 0)
-      MongoUserWithout.has_constant :salutations, ['Mr', 'Mrs']
-      assert_equal 'Mr', MongoUserWithout.new.salutation
+      MongoUser.send(:field, :salutation, :type => Integer, :default => 0)
+      MongoUser.has_constant :salutations, ['Mr', 'Mrs']
+      assert_equal 'Mr', MongoUser.new.salutation
     end
 
     should 'take the accessor into account when adding the field' do
-      MongoUserWithout.has_constant :salutations, ['Mr', 'Mrs'], :accessor => :sal
-      assert MongoUserWithout.fields.map(&:first).include?('sal')
+      MongoUser.has_constant :salutations, ['Mr', 'Mrs'], :accessor => :sal
+      assert MongoUser.fields.map(&:first).include?('sal')
     end
 
     should 'default values to translated values list' do
       I18n.stubs(:t).returns(['a', 'b'])
-      MongoUserWithout.has_constant :titles
-      assert_equal ['a', 'b'], MongoUserWithout.titles
+      MongoUser.has_constant :titles
+      assert_equal ['a', 'b'], MongoUser.titles
     end
 
     should 'add index when index option is supplied' do
-      MongoUserWithout.has_constant :salutations, ['Mr', 'Mrs'], :index => true
-      MongoUserWithout.create_indexes
-      assert MongoUserWithout.index_information.keys.any? { |key| key.match(/salutation/) }
+      MongoUser.has_constant :salutations, ['Mr', 'Mrs'], :index => true
+      MongoUser.create_indexes
+      assert MongoUser.index_information.keys.any? { |key| key.match(/salutation/) }
     end
 
     should 'not index when index option is not supplied' do
-      MongoUser.create_indexes
-      assert !MongoUser.index_information.keys.any? { |key| key.match(/salutation/) }
+      MongoUser2.create_indexes
+      assert !MongoUser2.index_information.keys.any? { |key| key.match(/salutation/) }
     end
 
     should 'save values as integers' do
+      MongoUser.has_constant :salutations, %w(Mr Mrs)
       m = MongoUser.new(:salutation => 'Mr')
       m.save!
       assert_equal 'Mr', m.salutation
@@ -65,25 +78,29 @@ class MongoidTest < Test::Unit::TestCase
     end
 
     should 'not be valid when an incorrect value is supplied' do
+      MongoUser.has_constant :salutations, %w(Mr Mrs)
       m = MongoUser.new(:salutation => 'asefe')
       assert !m.valid?
       assert_equal ['must be one of Mr, Mrs'], m.errors[:salutation]
     end
 
     should 'not be valid with an incorrect value is supplied and a proc/lambda has been used' do
-      m = MongoUserWithProc.new(:salutation => 'asefe')
+      MongoUser.has_constant :salutations, Proc.new { %w(Mr Mrs) }
+      m = MongoUser.new(:salutation => 'asefe')
       assert !m.valid?
       assert_equal ['must be one of Mr, Mrs'], m.errors[:salutation]
     end
 
     should 'be valid when a blank value is supplied' do
-      m = MongoUserWithProc.new(:salutation => '')
+      MongoUser.has_constant :salutations, Proc.new { %w(Mr Mrs) }
+      m = MongoUser.new(:salutation => '')
       assert m.valid?
     end
   end
 
   context 'Named Scopes' do
     setup do
+      MongoUser.has_constant :salutations, %w(Mr Mrs)
       @man = MongoUser.create!(:salutation => 'Mr')
       @woman = MongoUser.create!(:salutation => 'Mrs')
     end

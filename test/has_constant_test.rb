@@ -7,6 +7,13 @@ end
 
 class TestHasConstant < Test::Unit::TestCase
 
+  should 'be able to store values in a hash' do
+    Model.has_constant :salutations, { :first => 'Mr', :second => 'Mrs' }
+    m = Model.new
+    m.salutation = 'Mr'
+    assert m.instance_variable_get("@salutation") == 'first'
+  end
+
   should 'default values to translated values list' do
     I18n.stubs(:t).returns(['a', 'b'])
     Model.has_constant :titles
