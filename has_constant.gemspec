@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{has_constant}
-  s.version = "0.5.1"
+  s.version = "0.6.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["mattbeedle"]
@@ -28,12 +28,10 @@ Gem::Specification.new do |s|
     "has_constant.gemspec",
     "lib/has_constant.rb",
     "lib/has_constant/orm/active_model.rb",
-    "lib/has_constant/orm/active_record.rb",
     "lib/has_constant/orm/mongoid.rb",
     "test/has_constant_test.rb",
     "test/helper.rb",
     "test/unit/orm/active_model_test.rb",
-    "test/unit/orm/active_record_test.rb",
     "test/unit/orm/mongoid_test.rb"
   ]
   s.homepage = %q{http://github.com/mattbeedle/has_constant}
@@ -44,7 +42,6 @@ Gem::Specification.new do |s|
     "test/has_constant_test.rb",
     "test/helper.rb",
     "test/unit/orm/active_model_test.rb",
-    "test/unit/orm/active_record_test.rb",
     "test/unit/orm/mongoid_test.rb"
   ]
 
