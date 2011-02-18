@@ -42,6 +42,7 @@ module HasConstant
       singular = (options[:accessor] || name.to_s.singularize).to_s
 
       (class << self; self; end).instance_eval do
+        values = HashWithIndifferentAccess.new(values) if values.is_a?(Hash)
         define_method(name.to_s, values) if values.respond_to?(:call)
         define_method(name.to_s, lambda { values }) unless values.respond_to?(:call)
       end
@@ -53,8 +54,10 @@ module HasConstant
       # Add the setter method. This takes the string representation and converts it to an integer to store in the DB
       define_method("#{singular}=") do |val|
         if val.instance_of?(String)
-          if values.index(val)
+          if values.is_a?(Array) && values.index(val)
             instance_variable_set("@#{singular}", values.index(val))
+          elsif values.is_a?(Hash) && values.has_value?(val)
+            instance_variable_set("@#{singular}", values.invert[val].to_s)
           else
             raise ArgumentError, "value for #{singular} must be in #{self.class.send(name.to_s).join(', ')}"
           end

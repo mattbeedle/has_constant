@@ -23,7 +23,7 @@ module HasConstant
 
           class_eval do
             unless fields.map(&:first).include?(singular.to_s)
-              field singular.to_sym, { :type => Integer }.merge(options)
+              field singular.to_sym, { :type => values.is_a?(Array) ? Integer : String }.merge(options)
             end
 
             index singular.to_sym, :background => true if options[:index]
@@ -34,8 +34,10 @@ module HasConstant
 
           define_method("#{singular}=") do |val|
             if val.instance_of?(String)
-              if index = self.class.send(name.to_s).index(val)
+              if values.is_a?(Array) && index = self.class.send(name.to_s).index(val)
                 write_attribute singular.to_sym, index
+              elsif values.is_a?(Hash) && values.has_value?(val)
+                write_attribute singular.to_sym, values.invert[val]
               elsif !val.blank?
                 values = values.call if values.respond_to?(:call)
                 @has_constant_errors ||= {}
@@ -48,7 +50,11 @@ module HasConstant
 
           # Add the getter method. This returns the string representation of the stored value
           define_method(singular) do
-            eval("#{self.class}.#{name.to_s}[self.attributes[singular].to_i] if self.attributes[singular]")
+            if values.is_a?(Array)
+              self.class.send(name.to_s)[attributes[singular].to_i] if attributes[singular]
+            else
+              self.class.send(name.to_s)[attributes[singular]] if attributes[singular]
+            end
           end
 
           (class << self; self; end).instance_eval do
