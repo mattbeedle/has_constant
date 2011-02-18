@@ -7,8 +7,27 @@ class User < ActiveRecord::Base
   include HasConstant
 end
 
+class Thing < ActiveRecord::Base
+  include HasConstant
+end
+
 class ActiveModelTest < Test::Unit::TestCase
   context 'Instance' do
+    context 'using a hash' do
+      setup do
+        Thing.has_constant :salutations, { :first => 'Mr', :second => 'Mrs' }
+        @u = Thing.new :salutation => 'Mrs'
+      end
+
+      should 'store the hash key' do
+        assert_equal 'second', @u.attributes['salutation']
+      end
+
+      should 'return the correct value' do
+        assert_equal 'Mrs', @u.salutation
+      end
+    end
+
     should 'save values as integers' do
       User.has_constant :salutations, %w(Mr Mrs)
       u = User.new(:salutation => 'Mr')

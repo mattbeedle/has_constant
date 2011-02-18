@@ -8,13 +8,23 @@ class MongoUser
   include HasConstant
 end if defined?(Mongoid)
 
+class MongoUser2
+  include Mongoid::Document
+  include HasConstant
+end if defined?(Mongoid)
+
+class MongoUserWithHash
+  include Mongoid::Document
+  include HasConstant
+end if defined?(Mongoid)
+
 class MongoidTest < Test::Unit::TestCase
   context 'Instance' do
 
     context 'using a hash' do
       setup do
-        MongoUser.has_constant :salutations, { :first => 'Mr', :second => 'Mrs' }
-        @m = MongoUser.new(:salutation => 'Mr')
+        MongoUserWithHash.has_constant :salutations, { :first => 'Mr', :second => 'Mrs' }
+        @m = MongoUserWithHash.new(:salutation => 'Mr')
       end
 
       should 'store the hash key' do
@@ -55,9 +65,8 @@ class MongoidTest < Test::Unit::TestCase
     end
 
     should 'not index when index option is not supplied' do
-      MongoUser.collection.drop_indexes rescue nil
-      MongoUser.create_indexes
-      assert !MongoUser.index_information.keys.any? { |key| key.match(/salutation/) }
+      MongoUser2.create_indexes
+      assert !MongoUser2.index_information.keys.any? { |key| key.match(/salutation/) }
     end
 
     should 'save values as integers' do
