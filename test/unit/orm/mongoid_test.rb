@@ -27,8 +27,68 @@ class AnotherUser
   include HasConstant
 end
 
+class Thing
+  include Mongoid::Document
+  include HasConstant
+end
+
 class MongoidTest < Test::Unit::TestCase
   context 'Instance' do
+    context 'when storing arrays' do
+      setup do
+        MongoUserWithout.has_constant :sports, %w(running cycling tennis),
+          :as => :array
+        @user = MongoUserWithout.new :sports => %w(running tennis)
+      end
+
+      context 'setter' do
+        should 'take an array' do
+          assert_equal [0,2], @user.attributes['sports']
+        end
+      end
+
+      context 'getter' do
+        should 'return array of strings' do
+          assert_equal %w(running tennis), @user.sports
+        end
+      end
+
+      context 'named scopes' do
+        setup do
+          @u = MongoUserWithout.create! :sports => %w(running cycling)
+          @u2 = MongoUserWithout.create! :sports => %w(running tennis)
+        end
+
+        context 'includes scope' do
+          should 'return all where one of the array items is matched' do
+            assert_equal 1, MongoUserWithout.sports_include('cycling').count
+            assert MongoUserWithout.sports_include('cycling').include?(@u)
+          end
+
+          should 'work with array arguement' do
+            result = MongoUserWithout.sports_include(%w(running tennis))
+            assert_equal 1, result.count
+            assert result.include?(@u2)
+          end
+        end
+      end
+    end
+
+    context 'using a hash' do
+      setup do
+        Thing.has_constant :salutations, { :first => 'Mr', :second => 'Mrs' }
+        @u = Thing.new :salutation => 'Mrs'
+      end
+
+      should 'store the hash key' do
+        assert_equal 'second', @u.attributes['salutation']
+      end
+
+      should 'return the correct value' do
+        assert_equal 'Mrs', @u.salutation
+      end
+    end
+
     should 'add the field automatically' do
       MongoUserWithout.has_constant :salutations, ['Mr', 'Mrs']
       assert MongoUserWithout.fields.map(&:first).include?('salutation')
