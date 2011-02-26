@@ -24,7 +24,8 @@ module HasConstant
 
           class_eval do
             unless fields.map(&:first).include?(singular.to_s)
-              field singular.to_sym, { :type => Integer }.merge(options)
+              type = (options[:as] == :array) ? Array : Integer
+              field singular.to_sym, { :type => type }.merge(options)
             end
 
             index singular.to_sym, :background => true if options[:index]
