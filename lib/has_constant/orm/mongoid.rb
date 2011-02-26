@@ -24,8 +24,12 @@ module HasConstant
 
           class_eval do
             unless fields.map(&:first).include?(singular.to_s)
-              type = (options[:as] == :array) ? Array : Integer
-              field singular.to_sym, { :type => type }.merge(options)
+              if options[:as] == :array
+                field plural.to_sym, { :type => Array, :default => [] }.
+                  merge(options)
+              else
+                field singular.to_sym, { :type => Integer }.merge(options)
+              end
             end
 
             index singular.to_sym, :background => true if options[:index]
@@ -38,35 +42,35 @@ module HasConstant
           if options[:as] == :array
             define_method("#{plural}=") do |value_set|
               indexes = value_set.map do |value|
-                values.index(value)
+                self.class.send(plural).index(value)
               end
               write_attribute plural, indexes
             end
-          else
-            define_method("#{singular}=") do |val|
-              if val.instance_of?(String)
-                if index = self.class.send(name.to_s).index(val)
-                  write_attribute singular.to_sym, index
-                elsif !val.blank?
-                  values = values.call if values.respond_to?(:call)
-                  @has_constant_errors ||= {}
-                  @has_constant_errors.merge!(singular.to_sym => "must be one of #{values.join(', ')}")
-                end
-              else
-                write_attribute singular.to_sym, val
+          end
+
+          define_method("#{singular}=") do |val|
+            if val.instance_of?(String)
+              if index = self.class.send(name.to_s).index(val)
+                write_attribute singular.to_sym, index
+              elsif !val.blank?
+                values = values.call if values.respond_to?(:call)
+                @has_constant_errors ||= {}
+                @has_constant_errors.merge!(singular.to_sym => "must be one of #{values.join(', ')}")
               end
+            else
+              write_attribute singular.to_sym, val
             end
           end
 
           # Add the getter method. This returns the string representation of the stored value
           if options[:as] == :array
             define_method(plural) do
-              attributes[plural].map { |val| values[val] }
+              attributes[plural].map { |val| self.class.send(plural)[val] }
             end
-          else
-            define_method(singular) do
-              eval("#{self.class}.#{name.to_s}[self.attributes[singular].to_i] if self.attributes[singular]")
-            end
+          end
+
+          define_method(singular) do
+            eval("#{self.class}.#{name.to_s}[self.attributes[singular].to_i] if self.attributes[singular]")
           end
 
           (class << self; self; end).instance_eval do
