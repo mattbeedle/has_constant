@@ -30,6 +30,8 @@ end
 class Thing
   include Mongoid::Document
   include HasConstant
+
+  field :salutation, :type => String
 end
 
 class MongoidTest < Test::Unit::TestCase
@@ -78,14 +80,15 @@ class MongoidTest < Test::Unit::TestCase
       setup do
         Thing.has_constant :salutations, { :first => 'Mr', :second => 'Mrs' }
         @u = Thing.new :salutation => 'Mrs'
+        @u.save!
       end
 
       should 'store the hash key' do
-        assert_equal 'second', @u.attributes['salutation']
+        assert_equal 'second', @u.reload.attributes['salutation']
       end
 
       should 'return the correct value' do
-        assert_equal 'Mrs', @u.salutation
+        assert_equal 'Mrs', @u.reload.salutation
       end
     end
 

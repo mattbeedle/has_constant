@@ -28,7 +28,8 @@ module HasConstant
                 field plural.to_sym, { :type => Array, :default => [] }.
                   merge(options)
               else
-                field singular.to_sym, { :type => Integer }.merge(options)
+                type = values.is_a?(Hash) ? String : Integer
+                field singular.to_sym, { :type => type }.merge(options)
               end
             end
 
@@ -50,7 +51,13 @@ module HasConstant
 
           define_method("#{singular}=") do |val|
             if val.instance_of?(String)
-              if index = self.class.send(name.to_s).index(val)
+              if self.class.send(name).respond_to?(:key)
+                index = self.class.send(name.to_s).key(val).to_s
+              elsif self.class.send(name).respond_to?(:index)
+                index = self.class.send(name.to_s).index(val)
+                index = index.to_s if self.class.send(name.to_s).is_a?(Hash)
+              end
+              if index
                 write_attribute singular.to_sym, index
               elsif !val.blank?
                 values = values.call if values.respond_to?(:call)
@@ -70,7 +77,11 @@ module HasConstant
           end
 
           define_method(singular) do
-            eval("#{self.class}.#{name.to_s}[self.attributes[singular].to_i] if self.attributes[singular]")
+            if attributes[singular]
+              res = self.class.send(name.to_s)[attributes[singular].to_i] rescue nil
+              res ||= self.class.send(name.to_s)[attributes[singular]]
+              res ||= self.class.send(name.to_s)[attributes[singular].to_sym]
+            end
           end
 
           (class << self; self; end).instance_eval do
