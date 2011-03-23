@@ -28,7 +28,12 @@ module HasConstant
                 field plural.to_sym, { :type => Array, :default => [] }.
                   merge(options)
               else
-                type = values.is_a?(Hash) ? String : Integer
+                if values.is_a?(Hash) || values.respond_to?(:call) &&
+                  values.call.is_a?(Hash)
+                  type = String
+                else
+                  type = Integer
+                end
                 field singular.to_sym, { :type => type }.merge(options)
               end
             end
