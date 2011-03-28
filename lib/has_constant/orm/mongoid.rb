@@ -101,7 +101,14 @@ module HasConstant
             else
               define_method "#{singular}_is".to_sym do |values|
                 values = values.lines.to_a if values.respond_to?(:lines)
-                where(singular.to_sym.in => values.map { |v| self.send(name.to_sym).index(v) })
+                where(singular.to_sym.in => values.map do |v|
+                  options = self.send(name.to_sym)
+                  if options.respond_to?(:key)
+                    options.key(v)
+                  else
+                    options.index(v)
+                  end
+                end)
               end
 
               define_method "#{singular}_is_not".to_sym do |values|
