@@ -35,6 +35,7 @@ class Thing
 end
 
 class MongoidTest < Test::Unit::TestCase
+
   context 'Instance' do
     context 'when storing arrays' do
       setup do
@@ -89,6 +90,13 @@ class MongoidTest < Test::Unit::TestCase
 
       should 'return the correct value' do
         assert_equal 'Mrs', @u.reload.salutation
+      end
+
+      context '#update_attribute' do
+        should 'store the correct value' do
+          @u.update_attribute :salutation, 'Mr'
+          assert_equal 'Mr', @u.reload.salutation
+        end
       end
     end
 

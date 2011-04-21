@@ -40,15 +40,25 @@ module HasConstant
 
             index singular.to_sym, :background => true if options[:index]
 
-            named_scope :by_constant, lambda { |constant,value| { :where =>
-              { constant.to_sym => eval("#{self.to_s}.#{constant.pluralize}.index(value)") } } }
+            named_scope :by_constant, lambda { |constant, value|
+              if self.send(constant.pluralize).respond_to?(:key)
+                value_for_query = self.send(constant.pluralize).key(value)
+              else
+                value_for_query = self.send(constant.pluralize).index(value)
+              end
+              where(constant.to_sym => value_for_query)
+            }
           end
 
           # Define the setter method here
           if options[:as] == :array
             define_method("#{plural}=") do |value_set|
               indexes = value_set.map do |value|
-                self.class.send(plural).index(value)
+                if self.class.send(plural).respond_to?(:key)
+                  self.class.send(plural).key(value)
+                else
+                  self.class.send(plural).index(value)
+                end
               end
               write_attribute plural, indexes
             end
@@ -93,9 +103,17 @@ module HasConstant
             if options[:as] == :array
               define_method "#{plural}_include".to_sym do |value|
                 if value.is_a?(String)
-                  where(plural.to_sym => values.index(value))
+                  if values.respond_to?(:key)
+                    where(plural.to_sym => values.key(value))
+                  else
+                    where(plural.to_sym => values.index(value))
+                  end
                 else
-                  where(plural.to_sym => value.map { |v| send(plural).index(v) })
+                  if values.respond_to?(:key)
+                    where(plural.to_sym => value.map { |v| send(plural).key(v) })
+                  else
+                    where(plural.to_sym => value.map { |v| send(plural).index(v) })
+                  end
                 end
               end
             else
@@ -113,7 +131,12 @@ module HasConstant
 
               define_method "#{singular}_is_not".to_sym do |values|
                 values = values.lines.to_a if values.respond_to?(:lines)
-                where(singular.to_sym.nin => values.map { |v| self.send(name.to_sym).index(v) })
+                if self.send(plural).respond_to?(:key)
+                  values_for_query = values.map { |v| self.send(plural).key(v) }
+                else
+                  values_for_query = values.map { |v| self.send(plural).index(v) }
+                end
+                where(singular.to_sym.nin => values_for_query)
               end
             end
           end
