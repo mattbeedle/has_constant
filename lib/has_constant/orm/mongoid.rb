@@ -53,7 +53,7 @@ module HasConstant
           # Define the setter method here
           if options[:as] == :array
             define_method("#{plural}=") do |value_set|
-              indexes = value_set.map do |value|
+              indexes = (value_set.blank? ? [] : value_set).map do |value|
                 if self.class.send(plural).respond_to?(:key)
                   self.class.send(plural).key(value)
                 else
