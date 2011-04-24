@@ -79,7 +79,7 @@ module HasConstant
       define_method("#{singular}_in?") do |value_list|
         truth = value_list.include? send(singular)
         if !truth && I18n.locale.to_s != 'en'
-          truth = I18n.with_locale(:en) { vlue_list.include?(send(singular)) }
+          truth = I18n.with_locale(:en) { value_list.include?(send(singular)) }
         end
         truth
       end
