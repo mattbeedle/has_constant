@@ -65,7 +65,11 @@ module HasConstant
       end
 
       define_method("#{singular}_is?") do |value|
-        send(singular) == value.to_s
+        truth = send(singular) == value.to_s
+        if !truth && I18n.locale.to_s != 'en'
+          truth = I18n.with_locale(:en) { send(singular) == value.to_s }
+        end
+        truth
       end
 
       define_method("#{singular}_is_not?") do |value|
@@ -73,7 +77,11 @@ module HasConstant
       end
 
       define_method("#{singular}_in?") do |value_list|
-        value_list.include? send(singular)
+        truth = value_list.include? send(singular)
+        if !truth && I18n.locale.to_s != 'en'
+          truth = I18n.with_locale(:en) { vlue_list.include?(send(singular)) }
+        end
+        truth
       end
 
       define_method("#{singular}_not_in?") do |value_list|
