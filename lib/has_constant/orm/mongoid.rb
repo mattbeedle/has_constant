@@ -43,8 +43,14 @@ module HasConstant
             named_scope :by_constant, lambda { |constant, value|
               if self.send(constant.pluralize).respond_to?(:key)
                 value_for_query = self.send(constant.pluralize).key(value)
+                value_for_query ||= I18n.with_locale(:en) do
+                  self.send(constant.pluralize).key(value)
+                end
               else
                 value_for_query = self.send(constant.pluralize).index(value)
+                value_for_query ||= I18n.with_locale(:en) do
+                  send(contant.pluralize).index(value)
+                end
               end
               where(constant.to_sym => value_for_query)
             }
@@ -120,21 +126,26 @@ module HasConstant
               define_method "#{singular}_is".to_sym do |values|
                 values = values.lines.to_a if values.respond_to?(:lines)
                 where(singular.to_sym.in => values.map do |v|
-                  options = self.send(name.to_sym)
-                  if options.respond_to?(:key)
-                    options.key(v)
+                  if send(name).respond_to?(:key)
+                    send(name).key(v) || I18n.with_locale(:en) { send(name).key(v) }
                   else
-                    options.index(v)
+                    send(name).index(v) || I18n.with_locale(:en) { send(name).key(v) }
                   end
                 end)
               end
 
               define_method "#{singular}_is_not".to_sym do |values|
                 values = values.lines.to_a if values.respond_to?(:lines)
-                if self.send(plural).respond_to?(:key)
-                  values_for_query = values.map { |v| self.send(plural).key(v) }
+                if send(plural).respond_to?(:key)
+                  values_for_query = values.map { |v| send(plural).key(v) }.compact
+                  values_for_query = values.map do |v|
+                    I18n.with_locale(:en) { send(plural).key(v) }
+                  end.compact if values_for_query.blank?
                 else
-                  values_for_query = values.map { |v| self.send(plural).index(v) }
+                  values_for_query = values.map { |v| send(plural).index(v) }.compact
+                  values_for_query = values.map do |v|
+                    I18n.with_locale(:en) { send(plural).key(v) }
+                  end.compact if values_for_query.blank?
                 end
                 where(singular.to_sym.nin => values_for_query)
               end
