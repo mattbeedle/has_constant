@@ -144,7 +144,7 @@ module HasConstant
                 else
                   values_for_query = values.map { |v| send(plural).index(v) }.compact
                   values_for_query = values.map do |v|
-                    I18n.with_locale(:en) { send(plural).key(v) }
+                    I18n.with_locale(:en) { send(plural).index(v) }
                   end.compact if values_for_query.blank?
                 end
                 where(singular.to_sym.nin => values_for_query)
