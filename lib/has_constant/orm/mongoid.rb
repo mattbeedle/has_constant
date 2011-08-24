@@ -129,7 +129,7 @@ module HasConstant
                   if send(name).respond_to?(:key)
                     send(name).key(v) || I18n.with_locale(:en) { send(name).key(v) }
                   else
-                    send(name).index(v) || I18n.with_locale(:en) { send(name).key(v) }
+                    send(name).index(v) || I18n.with_locale(:en) { send(name).index(v) }
                   end
                 end)
               end
