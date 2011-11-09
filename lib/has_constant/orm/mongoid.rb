@@ -40,20 +40,22 @@ module HasConstant
 
             index singular.to_sym, :background => true if options[:index]
 
-            named_scope :by_constant, lambda { |constant, value|
-              if self.send(constant.pluralize).respond_to?(:key)
-                value_for_query = self.send(constant.pluralize).key(value)
-                value_for_query ||= I18n.with_locale(:en) do
-                  self.send(constant.pluralize).key(value)
+            unless respond_to?(:by_constant)
+              named_scope :by_constant, lambda { |constant, value|
+                if self.send(constant.pluralize).respond_to?(:key)
+                  value_for_query = self.send(constant.pluralize).key(value)
+                  value_for_query ||= I18n.with_locale(:en) do
+                    self.send(constant.pluralize).key(value)
+                  end
+                else
+                  value_for_query = self.send(constant.pluralize).index(value)
+                  value_for_query ||= I18n.with_locale(:en) do
+                    send(contant.pluralize).index(value)
+                  end
                 end
-              else
-                value_for_query = self.send(constant.pluralize).index(value)
-                value_for_query ||= I18n.with_locale(:en) do
-                  send(contant.pluralize).index(value)
-                end
-              end
-              where(constant.to_sym => value_for_query)
-            }
+                where(constant.to_sym => value_for_query)
+              }
+            end
           end
 
           # Define the setter method here
