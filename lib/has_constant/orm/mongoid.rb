@@ -41,7 +41,7 @@ module HasConstant
             index singular.to_sym, :background => true if options[:index]
 
             unless respond_to?(:by_constant)
-              named_scope :by_constant, lambda { |constant, value|
+              scope :by_constant, lambda { |constant, value|
                 if self.send(constant.pluralize).respond_to?(:key)
                   value_for_query = self.send(constant.pluralize).key(value)
                   value_for_query ||= I18n.with_locale(:en) do
