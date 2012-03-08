@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "has_constant"
-  s.version = "0.8.4"
+  s.version = "0.8.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["mattbeedle"]
-  s.date = "2011-11-09"
+  s.date = "2012-03-08"
   s.description = "Allows certain fields to be limited to a set of values"
   s.email = "mattbeedle@gmail.com"
   s.extra_rdoc_files = [
@@ -36,7 +36,7 @@ Gem::Specification.new do |s|
   ]
   s.homepage = "http://github.com/mattbeedle/has_constant"
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.10"
+  s.rubygems_version = "1.8.17"
   s.summary = "Allows certain fields to be limited to a set of values"
   s.test_files = [
     "test/has_constant_test.rb",
